@@ -11,5 +11,6 @@ public:
 	friend std::istream& operator>>(std::istream& in, Polynomial& poly);
 	std::vector<Monomial> polyLibrary;
 private:
+
 };
 
