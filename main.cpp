@@ -4,12 +4,10 @@ using namespace std;
 
 int main()
 {
-	Polynomial a;
-	cin >> a;
-	Polynomial::sortByPowerDescend(a.polyLibrary);
-	for(const auto& mono:a.polyLibrary)
-	{
-		cout << mono.toString();
-	}
+	Polynomial b;
+	ifstream fin("file/fuck.txt");	
+	cout << b << endl;
+	fin >> b;
+	cout << b;
 	return 0;
 }

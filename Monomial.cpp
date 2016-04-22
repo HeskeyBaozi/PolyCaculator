@@ -12,27 +12,6 @@ Monomial::Monomial(const std::string& monoString)
 	monoString >> *this;
 }
 
-string Monomial::toString() const
-{
-	string result;
-	if (getCoefficient() == 0)return result;
-	stringstream stream;
-	string power_;
-	stream << getPower();
-	stream >> power_;
-	if (getCoefficient() == 1 || getCoefficient() == -1)
-	{		
-		result = string(getCoefficient() > 0 ? "+" : "-") + string("x^") + power_;
-		return result;
-	}
-	string coefficient_;
-	stream.clear();
-	stream << getCoefficient();
-	stream >> coefficient_;
-	result = (getCoefficient() > 0 ? string("+") + coefficient_ : coefficient_) + string("x^") + power_;
-	return result;
-}
-
 int Monomial::getCoefficient() const
 {
 	return coefficient;
@@ -53,6 +32,12 @@ void Monomial::setPower(const int power_)
 	power = power_;
 }
 
+bool Monomial::isZero() const
+{
+	if (getCoefficient() == 0)return true;
+	return false;
+}
+
 istream& operator>>(istream& in, Monomial& mono)
 {
 	string monomialString;
@@ -61,11 +46,43 @@ istream& operator>>(istream& in, Monomial& mono)
 	return in;
 }
 
-int operator>>(const string& inString, Monomial& mono)
+std::ifstream& operator>>(std::ifstream& fin, Monomial& mono)
+{
+	string monomialString;
+	fin >> monomialString;
+	monomialString >> mono;
+	return fin;
+
+}
+
+bool operator>>(const string& inString, Monomial& mono)
 {
 	int coefficient_ = 0, power_ = 0;
 	int k = sscanf_s(inString.c_str(), "(%d,%d)", &coefficient_, &power_);
+	if (k != 2)cout << inString << " is failed to input. It is setted as (0,0)!!" << endl;
 	mono.setCoefficient(coefficient_);
 	mono.setPower(power_);
-	return k;
+	if (k == 2)return true;
+	return false;
+}
+
+ostream& operator<<(std::ostream& out, Monomial& mono)
+{
+	int coeff_ = mono.getCoefficient();
+	if (coeff_ == 0)return out;
+	int power_ = mono.getPower();
+	if (coeff_ < 0)
+	{
+		out << " - ";
+		coeff_ = -coeff_;
+	}
+	if (!(coeff_ == 1))out << coeff_;
+	if (power_ != 0)out << "x^" << power_;
+	return out;
+}
+
+std::ofstream& operator<<(std::ofstream& fout, Monomial& mono)
+{
+	fout << "(" << mono.getCoefficient() << "," << mono.getPower() << ")";
+	return fout;
 }

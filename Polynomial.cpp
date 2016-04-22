@@ -5,36 +5,72 @@ istream& operator>>(istream& in, Polynomial& poly)
 {
 	string polynomialString;
 	in >> polynomialString;
+	polynomialString >> poly;
+	return in;
+}
+
+void operator>>(string& polynomialString, Polynomial& poly)
+{
 	string::iterator i = polynomialString.begin();
 	string::iterator previous = i;
 	while (i != polynomialString.end())
 	{
 		while (i != polynomialString.end() && *i != '(')++i;
-		std::string monomialString(previous, i);
+		string monomialString(previous, i);
 		if (!monomialString.empty())
 		{
 			Monomial temp(monomialString);
-			poly.polyLibrary.push_back(temp);
+			if (!temp.isZero())poly.getPolyLibrary().push_back(temp);
 		}
 		previous = i;
 		if (previous != polynomialString.end())++i;
 	}
-	return in;
 }
 
-/*string Polynomial::toString() const
+ostream& operator<<(ostream& out, Polynomial& poly)
 {
-	for (size_t i = 0; i < polyLibrary.size(); ++i)
+	if (poly.getPolyLibrary().empty())
 	{
-		
+		out << "None";
+		return out;
 	}
-}*/
+	out << poly.getPolyLibrary()[0];
+	for (size_t i = 1; i < poly.getPolyLibrary().size(); i++)
+	{
+		if (poly.getPolyLibrary()[i].getCoefficient() >= 0)
+			out << " + ";
+		out << poly.getPolyLibrary()[i];
+	}
+	return out;
+}
 
-void Polynomial::sortByPowerDescend(vector<Monomial>& Poly)
+ofstream& operator<<(ofstream& fout, Polynomial& poly)
 {
-	std::sort(Poly.begin(),Poly.end(),[](const Monomial& lhs, const Monomial& rhs)
+	for (size_t i = 0; i < poly.getPolyLibrary().size();i++)
+	{
+		fout << poly.getPolyLibrary()[i];
+	}
+	return fout;
+}
+
+Polynomial::Polynomial()
+{
+}
+
+Polynomial::Polynomial(string polyString)
+{
+	polyString >> *this;
+}
+
+void Polynomial::sortByPowerDescend()
+{
+	std::sort(polyLibrary.begin(), polyLibrary.end(),[](const Monomial& lhs, const Monomial& rhs)
 	{
 		return lhs.getPower() > rhs.getPower();
 	});
 }
 
+inline vector<Monomial>& Polynomial::getPolyLibrary()
+{
+	return polyLibrary;
+}

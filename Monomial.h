@@ -1,6 +1,6 @@
 #pragma once
 #include <iostream>
-#include <sstream>
+#include <fstream>
 #include <string>
 #include <stdio.h>
 class Monomial
@@ -8,15 +8,18 @@ class Monomial
 public:
 	explicit Monomial(const int coefficient_ = 0, const int power_ = 0);
 	explicit Monomial(const std::string& monoString);
-	std::string toString() const; //todo
 	int getCoefficient() const;
 	int getPower() const;
 	void setCoefficient(const int coefficient_);
 	void setPower(const int power_);
+	bool isZero() const;
 private:
 	int coefficient;
 	int power;
 };
 
 std::istream& operator>>(std::istream& in, Monomial& mono);
-int operator>>(const std::string& inString, Monomial& mono);
+std::ifstream& operator>>(std::ifstream& fin, Monomial& mono);
+bool operator>>(const std::string& inString, Monomial& mono);
+std::ostream& operator<<(std::ostream& out, Monomial& mono);
+std::ofstream& operator<<(std::ofstream& fout, Monomial& mono);
