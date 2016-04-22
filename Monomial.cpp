@@ -25,6 +25,15 @@ int Monomial::getPower() const
 	return power;
 }
 
+double Monomial::getValue(double x) const
+{
+	double coeff_ = getCoefficient();
+	if (coeff_ == 0)
+		return 0;
+	double power_ = getPower();
+	return coeff_ * pow(x, power_);
+}
+
 void Monomial::setCoefficient(const int coefficient_)
 {
 	coefficient = coefficient_;
@@ -49,11 +58,15 @@ istream& operator>>(istream& in, Monomial& mono)
 	return in;
 }
 
+/*
+* istream ---> ifstream
+* ifstream 是 istream 的派生类
+* ifstream 可以当做 istream 来用
+*/
 ifstream& operator>>(ifstream& fin, Monomial& mono)
 {
-	string monomialString;
-	fin >> monomialString;
-	monomialString >> mono;
+	istream& in = fin;
+	in >> mono;
 	return fin;
 
 }
@@ -69,7 +82,7 @@ ifstream& operator>>(ifstream& fin, Monomial& mono)
 bool operator>>(const string& inString, Monomial& mono)
 {
 	int coefficient_ = 0, power_ = 0;
-	int successInputNumber = 
+	int successInputNumber =
 		sscanf_s(inString.c_str(), "(%d,%d)", &coefficient_, &power_);
 
 	/*
@@ -98,7 +111,7 @@ ostream& operator<<(std::ostream& out, Monomial& mono)
 	/*
 	* 若系数为0, 则该单项式为0, 不用输出任何字符
 	*/
-	if (coeff_ == 0)return out;	
+	if (coeff_ == 0)return out;
 
 	int power_ = mono.getPower();
 

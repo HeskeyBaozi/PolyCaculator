@@ -48,7 +48,7 @@ int operator>>(string& polynomialString, Polynomial& poly)
 			Monomial mTemp(mString);
 			if (!mTemp.isZero())
 			{
-				poly.getPolyLibrary().push_back(mTemp);
+				poly.polyLibrary.push_back(mTemp);
 				mNumber++;
 			}
 		}
@@ -63,34 +63,51 @@ int operator>>(string& polynomialString, Polynomial& poly)
 	return mNumber;
 }
 
+/*
+*  重载<<运算符: 输出一个多项式到屏幕
+*          out: 输出流
+*         poly: 要输出的多项式
+*       return: ostream& 保证链式调用
+*         约定: 多项式由一个空格开始
+*               每个符号间都有一个空格
+*/
 ostream& operator<<(ostream& out, Polynomial& poly)
 {
-	if (poly.getPolyLibrary().empty())
+	/*
+	* 若多项式为空, 输出警告信息
+	*/
+	if (poly.polyLibrary.empty())
 	{
-		out << "Empty Polynomial!";
+		out << " [Empty Polynomial!]";
 		return out;
 	}
-	out << poly.getPolyLibrary()[0];
-	for (size_t i = 1; i < poly.getPolyLibrary().size(); i++)
+
+	/*
+	* 保证第一项的系数是正数情况下, 多项式由空格开始
+	*/
+	if (poly.polyLibrary[0].getCoefficient() >= 0)
+		out << " ";
+	out << poly.polyLibrary[0];
+
+	/*
+	* 遍历每个单项式并输出
+	*/
+	for (size_t i = 1; i < poly.polyLibrary.size(); i++)
 	{
-		if (poly.getPolyLibrary()[i].getCoefficient() >= 0)
+		if (poly.polyLibrary[i].getCoefficient() >= 0)
 			out << " + ";
-		out << poly.getPolyLibrary()[i];
+		out << poly.polyLibrary[i];
 	}
 	return out;
 }
 
 ofstream& operator<<(ofstream& fout, Polynomial& poly)
 {
-	for (size_t i = 0; i < poly.getPolyLibrary().size();i++)
+	for (size_t i = 0; i < poly.polyLibrary.size(); i++)
 	{
-		fout << poly.getPolyLibrary()[i];
+		fout << poly.polyLibrary[i];
 	}
 	return fout;
-}
-
-Polynomial::Polynomial()
-{
 }
 
 Polynomial::Polynomial(string polyString)
@@ -109,13 +126,18 @@ void Polynomial::sortByPowerDescend()
 	* 第三个参数是一个lambda表达式
 	* 这个lambda表达式表示排序靠前的指数要大于排序靠后的
 	*/
-	std::sort(polyLibrary.begin(), polyLibrary.end(),[](const Monomial& lhs, const Monomial& rhs)
+	std::sort(polyLibrary.begin(), polyLibrary.end(), [](const Monomial& lhs, const Monomial& rhs)
 	{
 		return lhs.getPower() > rhs.getPower();
 	});
 }
 
-inline vector<Monomial>& Polynomial::getPolyLibrary()
+double Polynomial::getValue(double x)
 {
-	return polyLibrary;
+	double sum = 0;
+	for (size_t i = 0; i < polyLibrary.size(); i++)
+	{
+		sum += polyLibrary[i].getValue(x);
+	}
+	return sum;
 }

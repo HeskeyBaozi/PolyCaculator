@@ -1,13 +1,16 @@
 #include <iostream>
-#include "Polynomial.h"
+#include "PolyDictionary.h"
 using namespace std;
 
 int main()
 {
-	Polynomial b;
-	ifstream fin("file/fuck.txt");	
-	cout << b << endl;
-	fin >> b;
-	cout << b;
+	ifstream fin("file/data.txt");
+	PolyDictionary d;
+	cout << d << endl;
+	fin >> d;
+	cout << d << endl;
+	ofstream fout("file/data.txt",ofstream::app);
+	cin >> d;
+	fout << d;
 	return 0;
 }
