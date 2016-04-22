@@ -1,12 +1,12 @@
 #include "Polynomial.h"
+using namespace std;
 
-
-std::istream& operator>>(std::istream& in, Polynomial& poly)
+istream& operator>>(istream& in, Polynomial& poly)
 {
-	std::string polynomialString;
+	string polynomialString;
 	in >> polynomialString;
-	std::string::iterator i = polynomialString.begin();
-	std::string::iterator previous = i;
+	string::iterator i = polynomialString.begin();
+	string::iterator previous = i;
 	while (i != polynomialString.end())
 	{
 		while (i != polynomialString.end() && *i != '(')++i;
@@ -19,7 +19,22 @@ std::istream& operator>>(std::istream& in, Polynomial& poly)
 		previous = i;
 		if (previous != polynomialString.end())++i;
 	}
-
-
 	return in;
 }
+
+/*string Polynomial::toString() const
+{
+	for (size_t i = 0; i < polyLibrary.size(); ++i)
+	{
+		
+	}
+}*/
+
+void Polynomial::sortByPowerDescend(vector<Monomial>& Poly)
+{
+	std::sort(Poly.begin(),Poly.end(),[](const Monomial& lhs, const Monomial& rhs)
+	{
+		return lhs.getPower() > rhs.getPower();
+	});
+}
+
