@@ -5,14 +5,20 @@
 #include <stdio.h>
 class Monomial
 {
+	/*
+	* Monomial 单项式类
+	*/
 public:
 	explicit Monomial(const int coefficient_ = 0, const int power_ = 0);
 	explicit Monomial(const std::string& monoString);
+
 	int getCoefficient() const;
 	int getPower() const;
+	bool isZero() const;
+
 	void setCoefficient(const int coefficient_);
 	void setPower(const int power_);
-	bool isZero() const;
+	
 private:
 	int coefficient;
 	int power;

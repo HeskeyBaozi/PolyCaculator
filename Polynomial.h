@@ -4,11 +4,14 @@
 #include <vector>
 #include "Monomial.h"
 class Polynomial
-{	
+{
+	/*
+	* Polynomial 多项式类
+	* 多项式类由单项式的可变数组构成
+	*/
 public:
 	Polynomial();
 	explicit Polynomial(std::string polyString);
-	friend std::istream& operator>>(std::istream& in, Polynomial& poly);
 	void sortByPowerDescend();
 	std::vector<Monomial>& getPolyLibrary();
 	
@@ -16,7 +19,9 @@ private:
 	std::vector<Monomial> polyLibrary;
 };
 
-void operator>>(std::string& polynomialString, Polynomial& poly);
+std::istream& operator>>(std::istream& in, Polynomial& poly);
+int operator>>(std::string& polynomialString, Polynomial& poly);
 std::ostream& operator<<(std::ostream& out, Polynomial& poly);
 std::ofstream& operator<<(std::ofstream& fout, Polynomial& poly);
+
 
