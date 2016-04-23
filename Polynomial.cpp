@@ -48,7 +48,7 @@ int operator>>(string& polynomialString, Polynomial& poly)
 			Monomial mTemp(mString);
 			if (!mTemp.isZero())
 			{
-				poly.polyLibrary.push_back(mTemp);
+				poly.getPolyLibrary().push_back(mTemp);
 				mNumber++;
 			}
 		}
@@ -60,6 +60,10 @@ int operator>>(string& polynomialString, Polynomial& poly)
 		if (mHead != polynomialString.end())
 			++mTail;
 	}
+	/*
+	* 将输入进来的多项式按指数降序排序
+	*/
+	poly.sortByPowerDescend();
 	return mNumber;
 }
 
@@ -76,7 +80,7 @@ ostream& operator<<(ostream& out, Polynomial& poly)
 	/*
 	* 若多项式为空, 输出警告信息
 	*/
-	if (poly.polyLibrary.empty())
+	if (poly.getPolyLibrary().empty())
 	{
 		out << " [Empty Polynomial!]";
 		return out;
@@ -85,27 +89,27 @@ ostream& operator<<(ostream& out, Polynomial& poly)
 	/*
 	* 保证第一项的系数是正数情况下, 多项式由空格开始
 	*/
-	if (poly.polyLibrary[0].getCoefficient() >= 0)
+	if (poly.getPolyLibrary()[0].getCoefficient() >= 0)
 		out << " ";
-	out << poly.polyLibrary[0];
+	out << poly.getPolyLibrary()[0];
 
 	/*
 	* 遍历每个单项式并输出
 	*/
-	for (size_t i = 1; i < poly.polyLibrary.size(); i++)
+	for (size_t i = 1; i < poly.getPolyLibrary().size(); i++)
 	{
-		if (poly.polyLibrary[i].getCoefficient() >= 0)
+		if (poly.getPolyLibrary()[i].getCoefficient() >= 0)
 			out << " + ";
-		out << poly.polyLibrary[i];
+		out << poly.getPolyLibrary()[i];
 	}
 	return out;
 }
 
 ofstream& operator<<(ofstream& fout, Polynomial& poly)
 {
-	for (size_t i = 0; i < poly.polyLibrary.size(); i++)
+	for (size_t i = 0; i < poly.getPolyLibrary().size(); i++)
 	{
-		fout << poly.polyLibrary[i];
+		fout << poly.getPolyLibrary()[i];
 	}
 	return fout;
 }
@@ -113,6 +117,10 @@ ofstream& operator<<(ofstream& fout, Polynomial& poly)
 Polynomial::Polynomial(string polyString)
 {
 	polyString >> *this;
+}
+
+Polynomial::Polynomial()
+{
 }
 
 /*
@@ -132,12 +140,110 @@ void Polynomial::sortByPowerDescend()
 	});
 }
 
-double Polynomial::getValue(double x)
+inline vector<Monomial>& Polynomial::getPolyLibrary()
+{
+	return polyLibrary;
+}
+
+Polynomial Polynomial::operator-() const
+{
+	Polynomial temp = *this;
+	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
+	i != temp.getPolyLibrary().end();++i)
+	{
+		*i = -*i;
+	}
+	return temp;
+}
+
+double Polynomial::operator()(double x) const
 {
 	double sum = 0;
 	for (size_t i = 0; i < polyLibrary.size(); i++)
 	{
-		sum += polyLibrary[i].getValue(x);
+		sum += polyLibrary[i](x);
 	}
 	return sum;
+}
+
+Polynomial Polynomial::operator!() const
+{
+	Polynomial temp = *this;
+	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
+	i != temp.getPolyLibrary().end(); ++i)
+	{
+		*i = !*i;
+	}
+	return temp;
+}
+
+Polynomial Polynomial::operator~() const
+{
+	Polynomial temp = *this;
+	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
+	i != temp.getPolyLibrary().end(); ++i)
+	{
+		*i = ~*i;
+	}
+	return temp;
+}
+
+double Polynomial::operator()(const double lowerBound, const double upperBound)
+{
+	double resultSum = 0;
+	for (vector<Monomial>::iterator i = polyLibrary.begin();
+	i != polyLibrary.end(); ++i)
+	{
+		resultSum += (*i)(lowerBound, upperBound);
+	}
+	return resultSum;
+}
+
+Polynomial operator+(Polynomial& lhs, Polynomial& rhs)
+{
+	Polynomial temp;
+	vector<Monomial>::iterator lhsPoint = lhs.getPolyLibrary().begin();
+	vector<Monomial>::iterator rhsPoint = rhs.getPolyLibrary().begin();
+	while (lhsPoint != lhs.getPolyLibrary().end()
+		&& rhsPoint != rhs.getPolyLibrary().end())
+	{
+		if (*lhsPoint == *rhsPoint)
+		{
+			Monomial result = *lhsPoint + *rhsPoint;
+			if (abs(result.getCoefficient()) > Ep)
+				temp.getPolyLibrary().push_back(result);
+			++lhsPoint;
+			++rhsPoint;
+		}
+		else
+		{
+			if (*lhsPoint > *rhsPoint)
+			{
+				temp.getPolyLibrary().push_back(*lhsPoint);
+				++lhsPoint;
+			}
+			else
+			{
+				temp.getPolyLibrary().push_back(*rhsPoint);
+				++rhsPoint;
+			}
+		}
+	}
+	while (lhsPoint != lhs.getPolyLibrary().end())
+	{
+		temp.getPolyLibrary().push_back(*lhsPoint);
+		++lhsPoint;
+	}
+	while (rhsPoint != rhs.getPolyLibrary().end())
+	{
+		temp.getPolyLibrary().push_back(*rhsPoint);
+		++rhsPoint;
+	}
+	return temp;
+}
+
+Polynomial operator-(Polynomial& lhs, Polynomial& rhs)
+{
+	Polynomial reverseRhs = -rhs;
+	return lhs + reverseRhs;
 }

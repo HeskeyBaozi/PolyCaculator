@@ -8,13 +8,15 @@ class PolyDictionary
 	* 这个类是对键值对集合的封装
 	*/
 public:
-	friend int operator>>(std::ifstream& fin, PolyDictionary& dictionary);
-	friend std::istream& operator>>(std::istream& in, PolyDictionary& poly);
-	friend std::ofstream& operator<<(std::ofstream& fout, PolyDictionary& poly);
-	friend std::ostream& operator<<(std::ostream& out, PolyDictionary& poly);
-		
+	std::map<std::string, Polynomial>& getDictionary();
+	double operator()(const std::string& key, double x) const;
+	Polynomial& operator[](const std::string& key);
 private:
 	std::map<std::string, Polynomial> dictionary;
 };
 
+int operator>>(std::ifstream& fin, PolyDictionary& dictionary);
+std::istream& operator>>(std::istream& in, PolyDictionary& poly);
+std::ofstream& operator<<(std::ofstream& fout, PolyDictionary& poly);
+std::ostream& operator<<(std::ostream& out, PolyDictionary& poly);
 

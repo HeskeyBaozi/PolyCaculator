@@ -1,7 +1,11 @@
 #include "Monomial.h"
 using namespace std;
 
-Monomial::Monomial(const int coefficient_, const int power_)
+/*
+* coeff_ == 0  <=> abs(coeff_ - 0) < Ep
+*/
+
+Monomial::Monomial(const double coefficient_, const double power_)
 {
 	setCoefficient(coefficient_);
 	setPower(power_);
@@ -15,33 +19,80 @@ Monomial::Monomial(const std::string& monoString)
 	monoString >> *this;
 }
 
-int Monomial::getCoefficient() const
+Monomial::Monomial(const Monomial& oldMono)
+{
+	setCoefficient(oldMono.getCoefficient());
+	setPower(oldMono.getPower());
+}
+
+inline double Monomial::getCoefficient() const
 {
 	return coefficient;
 }
 
-int Monomial::getPower() const
+inline double Monomial::getPower() const
 {
 	return power;
 }
 
-double Monomial::getValue(double x) const
+inline void Monomial::setCoefficient(const double coefficient_)
+{
+	coefficient = coefficient_;
+}
+
+inline void Monomial::setPower(const double power_)
+{
+	power = power_;
+}
+
+Monomial Monomial::operator-() const
+{
+	Monomial temp(-getCoefficient(), getPower());
+	return temp;
+}
+
+Monomial& Monomial::operator+=(const Monomial& rhs)
+{
+	*this = *this + rhs;
+	return *this;
+}
+
+Monomial& Monomial::operator-=(const Monomial& rhs)
+{
+	*this = *this - rhs;
+	return *this;
+}
+
+double Monomial::operator()(double x) const
 {
 	double coeff_ = getCoefficient();
-	if (coeff_ == 0)
+	if (abs(coeff_ - 0) < Ep)
 		return 0;
 	double power_ = getPower();
 	return coeff_ * pow(x, power_);
 }
 
-void Monomial::setCoefficient(const int coefficient_)
+Monomial Monomial::operator!() const
 {
-	coefficient = coefficient_;
+	Monomial temp(
+		getCoefficient()*getPower(),
+		getPower() - 1);
+	return temp;
 }
 
-void Monomial::setPower(const int power_)
+Monomial Monomial::operator~() const
 {
-	power = power_;
+	Monomial temp(
+		getCoefficient() / (getPower() + 1),
+		getPower() + 1);
+	return temp;
+}
+
+double Monomial::operator()(const double lowerBound, const double upperBound) const
+{
+	double fUpper = (~*this)(upperBound);
+	double fLower = (~*this)(lowerBound);
+	return fUpper - fLower;
 }
 
 bool Monomial::isZero() const
@@ -81,9 +132,9 @@ ifstream& operator>>(ifstream& fin, Monomial& mono)
 */
 bool operator>>(const string& inString, Monomial& mono)
 {
-	int coefficient_ = 0, power_ = 0;
+	double coefficient_ = 0, power_ = 0;
 	int successInputNumber =
-		sscanf_s(inString.c_str(), "(%d,%d)", &coefficient_, &power_);
+		sscanf_s(inString.c_str(), "(%lf,%lf)", &coefficient_, &power_);
 
 	/*
 	* 若读取失败, 输出失败提示
@@ -104,16 +155,16 @@ bool operator>>(const string& inString, Monomial& mono)
 /*
 * 向输出流以人类友好的形式输出单项式
 */
-ostream& operator<<(std::ostream& out, Monomial& mono)
+ostream& operator<<(ostream& out, Monomial& mono)
 {
-	int coeff_ = mono.getCoefficient();
+	double coeff_ = mono.getCoefficient();
 
 	/*
 	* 若系数为0, 则该单项式为0, 不用输出任何字符
 	*/
-	if (coeff_ == 0)return out;
+	if (abs(coeff_ - 0) < Ep)return out;
 
-	int power_ = mono.getPower();
+	double power_ = mono.getPower();
 
 	/*
 	* 若系数为负值, 则输出一个负号, 取绝对值
@@ -127,12 +178,22 @@ ostream& operator<<(std::ostream& out, Monomial& mono)
 	/*
 	* 若系数为1, 则系数本身不必输出
 	*/
-	if (coeff_ != 1)out << coeff_;
+	if (abs(coeff_ - 1)>Ep)
+		out << coeff_;
 
 	/*
 	* 若指数为1, 则指数部分不必输出
 	*/
-	if (power_ != 0)out << "x^" << power_;
+	if (abs(power_ - 0) > Ep)
+	{
+		if (abs(power_ - 1) < Ep)
+		{
+			out << "x";
+		}else
+		{
+			out << "x^" << power_;
+		}
+	}
 	return out;
 }
 
@@ -143,4 +204,56 @@ ofstream& operator<<(ofstream& fout, Monomial& mono)
 {
 	fout << "(" << mono.getCoefficient() << "," << mono.getPower() << ")";
 	return fout;
+}
+
+Monomial operator+(const Monomial& lhs, const Monomial& rhs)
+{
+	Monomial temp(0, lhs.getPower());
+	if (abs(lhs.getPower() - rhs.getPower()) > Ep)		
+	{
+		cerr << "指数不一样 无法操作";
+		return temp;
+	}
+	temp.setCoefficient(lhs.getCoefficient() + rhs.getCoefficient());
+	return temp;
+}
+
+Monomial operator-(const Monomial& lhs, const Monomial& rhs)
+{
+	return lhs + (-rhs);
+}
+
+bool operator==(const Monomial& lhs, const Monomial& rhs)
+{
+	if (abs(lhs.getPower() - rhs.getPower()) < Ep)
+		return true;
+	return false;
+}
+
+bool operator!=(const Monomial& lhs, const Monomial& rhs)
+{
+	return !(lhs == rhs);
+}
+
+bool operator<(const Monomial& lhs, const Monomial& rhs)
+{
+	if (lhs.getPower() < rhs.getPower()
+		&& abs(lhs.getPower() - rhs.getPower()) > Ep)
+		return true;
+	return false;
+}
+
+bool operator<=(const Monomial& lhs, const Monomial& rhs)
+{
+	return lhs < rhs || lhs == rhs;
+}
+
+bool operator>(const Monomial& lhs, const Monomial& rhs)
+{
+	return !(lhs <= rhs);
+}
+
+bool operator>=(const Monomial& lhs, const Monomial& rhs)
+{
+	return !(lhs < rhs);
 }
