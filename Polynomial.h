@@ -37,10 +37,11 @@ private:
 
 std::istream& operator>>(std::istream& in, Polynomial& poly);
 int operator>>(std::string& polynomialString, Polynomial& poly);
+
 std::ostream& operator<<(std::ostream& out, Polynomial& poly);
 std::ofstream& operator<<(std::ofstream& fout, Polynomial& poly);
+
 Polynomial operator+(Polynomial& lhs, Polynomial& rhs);
 Polynomial operator-(Polynomial& lhs, Polynomial& rhs);
-
-
-
+Polynomial operator*(Monomial& lhs, Polynomial& rhs);
+Polynomial operator*(Polynomial& lhs, Polynomial& rhs);

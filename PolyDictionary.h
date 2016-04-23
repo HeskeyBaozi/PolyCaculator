@@ -17,6 +17,7 @@ private:
 
 int operator>>(std::ifstream& fin, PolyDictionary& dictionary);
 std::istream& operator>>(std::istream& in, PolyDictionary& poly);
+
 std::ofstream& operator<<(std::ofstream& fout, PolyDictionary& poly);
 std::ostream& operator<<(std::ostream& out, PolyDictionary& poly);
 

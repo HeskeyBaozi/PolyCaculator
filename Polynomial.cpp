@@ -247,3 +247,27 @@ Polynomial operator-(Polynomial& lhs, Polynomial& rhs)
 	Polynomial reverseRhs = -rhs;
 	return lhs + reverseRhs;
 }
+
+Polynomial operator*(Monomial& lhs, Polynomial& rhs)
+{
+	Polynomial temp = rhs;
+	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
+	i != temp.getPolyLibrary().end(); ++i)
+	{
+		*i = lhs * (*i);
+	}
+	return temp;
+}
+
+Polynomial operator*(Polynomial& lhs, Polynomial& rhs)
+{
+	Polynomial resultPoly;
+	Polynomial lhsTemp = lhs;
+	for (vector<Monomial>::iterator lhsItemPoint = lhsTemp.getPolyLibrary().begin();
+	lhsItemPoint != lhsTemp.getPolyLibrary().end(); ++lhsItemPoint)
+	{
+		Polynomial monoMultiPoly = (*lhsItemPoint) * rhs;
+		resultPoly = resultPoly + monoMultiPoly;
+	}
+	return resultPoly;
+}

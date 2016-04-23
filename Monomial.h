@@ -26,8 +26,6 @@ public:
 	* 调用()运算符用来求值
 	*/
 	Monomial operator-() const;
-	Monomial& operator+=(const Monomial& rhs);
-	Monomial& operator-=(const Monomial& rhs);
 	double operator()(double x)const;
 
 	/*
@@ -67,6 +65,8 @@ std::ofstream& operator<<(std::ofstream& fout, Monomial& mono);
 */
 Monomial operator+(const Monomial& lhs, const Monomial& rhs);
 Monomial operator-(const Monomial& lhs, const Monomial& rhs);
+Monomial operator*(const Monomial& lhs, const Monomial& rhs);
+Monomial operator/(const Monomial& lhs, const Monomial& rhs);
 bool operator==(const Monomial& lhs, const Monomial& rhs);
 bool operator!=(const Monomial& lhs, const Monomial& rhs);
 bool operator<(const Monomial& lhs, const Monomial& rhs);

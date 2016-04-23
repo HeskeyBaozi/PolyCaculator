@@ -51,18 +51,6 @@ Monomial Monomial::operator-() const
 	return temp;
 }
 
-Monomial& Monomial::operator+=(const Monomial& rhs)
-{
-	*this = *this + rhs;
-	return *this;
-}
-
-Monomial& Monomial::operator-=(const Monomial& rhs)
-{
-	*this = *this - rhs;
-	return *this;
-}
-
 double Monomial::operator()(double x) const
 {
 	double coeff_ = getCoefficient();
@@ -139,8 +127,8 @@ bool operator>>(const string& inString, Monomial& mono)
 	/*
 	* 若读取失败, 输出失败提示
 	*/
-	if (successInputNumber != 2)
-		cout << inString << " is failed to input." << endl;
+	/*if (successInputNumber != 2)
+		cout << inString << " is failed to input." << endl;*/
 
 	/*
 	* 设置单项式的系数和指数, 默认为0
@@ -221,6 +209,22 @@ Monomial operator+(const Monomial& lhs, const Monomial& rhs)
 Monomial operator-(const Monomial& lhs, const Monomial& rhs)
 {
 	return lhs + (-rhs);
+}
+
+Monomial operator*(const Monomial& lhs, const Monomial& rhs)
+{
+	Monomial temp(
+		lhs.getCoefficient()*rhs.getCoefficient(),
+		lhs.getPower() + rhs.getPower());
+	return temp;
+}
+
+Monomial operator/(const Monomial& lhs, const Monomial& rhs)
+{
+	Monomial temp(
+		lhs.getCoefficient() / rhs.getCoefficient(),
+		lhs.getPower() - rhs.getPower());
+	return temp;
 }
 
 bool operator==(const Monomial& lhs, const Monomial& rhs)

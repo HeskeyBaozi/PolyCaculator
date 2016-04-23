@@ -61,7 +61,9 @@ istream& operator>>(istream& in, PolyDictionary& poly)
 {
 	string key;
 	string polyString;
+	cout << "请输入该多项式的名字(回车结束)" << endl;	
 	getline(in, key, '\n');
+	cout << "请输入该多项式(回车结束)" << endl;
 	getline(in, polyString, '\n');
 	Polynomial pTemp(polyString);
 	poly.getDictionary().emplace(key, pTemp);

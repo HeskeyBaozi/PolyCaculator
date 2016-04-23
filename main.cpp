@@ -1,19 +1,27 @@
 #include <iostream>
-#include "PolyDictionary.h"
+#include "System.h"
 using namespace std;
 
 int main()
 {
-	ifstream fin("file/out.txt");
-	//ofstream fout("file/out.txt");
-	PolyDictionary d;
-	cout << "空字典:\n" << d << endl;
-	fin >> d;
-	cout << "读入文件后字典:\n" << d << endl;
-	cout << d["a"](3) << endl;
-	cout << d["a"] + d["b"] << endl;
-	//cin >> d;
-	//cout << "输入后的字典:\n" << d << endl;
-	//fout << d << endl;
+	System sys;
+	sys.displayHead("Welcome to use my Poly-Caculator", true, true);
+	int numberChosen = sys.getValidNumber(0, 3);
+	system("cls");
+	while (numberChosen != 0)
+	{
+		switch(numberChosen)
+		{
+		case 1:
+			sys.displayStoragedPolyDictionary();
+			break;
+		}
+		int zeroToBack = sys.getValidNumber(0, 0);
+		system("cls");
+		sys.displayHead("Welcome to use my Poly-Caculator", true, true);
+		numberChosen = sys.getValidNumber(0, 3);
+		system("cls");
+	}
+	sys.displayHead("GoodBye! See you next time..", true);
 	return 0;
 }
