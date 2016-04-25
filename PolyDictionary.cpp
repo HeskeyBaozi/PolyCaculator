@@ -1,6 +1,20 @@
 #include "PolyDictionary.h"
 using namespace std;
 
+void clearSpace(std::string& str, char spaceChar)
+{
+	size_t spaceBegin = str.npos;
+	size_t spaceEnd = str.npos;
+	spaceBegin = str.find_first_of(spaceChar);
+	spaceEnd = str.find_first_not_of(spaceChar);
+	if (spaceBegin != str.npos&&spaceEnd != str.npos)
+		str.replace(spaceBegin, spaceEnd, "");
+	spaceBegin = str.find_first_of(spaceChar);
+	spaceEnd = str.find_last_of(spaceChar);
+	if (spaceBegin != str.npos&&spaceEnd != str.npos)
+		str.replace(spaceBegin, spaceEnd, "");
+}
+
 /*
 *   重载>>运算符: 通过文件读取到字典中
 *           fin: 文件输入流
@@ -27,11 +41,8 @@ int operator>>(ifstream& fin, PolyDictionary& dictionary)
 		* 同时清除key串中开头多余空白字符
 		*/
 		getline(fin, key, ':');
-		if (key[0] == ' ' || key[0] == '\n')
-		{
-			key.replace(0, key.find_first_not_of(' '), "");
-			key.replace(0, key.find_first_not_of('\n'), "");
-		}
+		clearSpace(key, ' ');
+		clearSpace(key, '\n');
 		getline(fin, polyString, ';');
 		if (!key.empty() && !polyString.empty())
 		{
@@ -55,19 +66,6 @@ ostream& operator<<(ostream& out, PolyDictionary& poly)
 		out << i->first << "(x) =" << i->second << endl;
 	}
 	return out;
-}
-
-istream& operator>>(istream& in, PolyDictionary& poly)
-{
-	string key;
-	string polyString;
-	cout << "请输入该多项式的名字(回车结束)" << endl;	
-	getline(in, key, '\n');
-	cout << "请输入该多项式(回车结束)" << endl;
-	getline(in, polyString, '\n');
-	Polynomial pTemp(polyString);
-	poly.getDictionary().emplace(key, pTemp);
-	return in;
 }
 
 ofstream& operator<<(ofstream& fout, PolyDictionary& poly)

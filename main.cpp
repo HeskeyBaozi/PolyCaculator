@@ -5,23 +5,23 @@ using namespace std;
 int main()
 {
 	System sys;
-	sys.displayHead("Welcome to use my Poly-Caculator", true, true);
-	int numberChosen = sys.getValidNumber(0, 3);
-	system("cls");
-	while (numberChosen != 0)
+	sys.displayHead("欢迎使用!");
+	sys.displayFunction();
+	string order;
+	cout << ">>> ";
+	getline(cin, order, '\n');
+	while (order != "quit")
 	{
-		switch(numberChosen)
-		{
-		case 1:
-			sys.displayStoragedPolyDictionary();
-			break;
-		}
-		int zeroToBack = sys.getValidNumber(0, 0);
-		system("cls");
-		sys.displayHead("Welcome to use my Poly-Caculator", true, true);
-		numberChosen = sys.getValidNumber(0, 3);
-		system("cls");
+		istringstream orderFlow(order);
+		string instruction;
+		string content;
+		getline(orderFlow, instruction, ' ');
+		getline(orderFlow, content, '\n');
+		sys.dealContent(instruction, content);
+		
+		cout << ">>> ";
+		getline(cin, order, '\n');
 	}
-	sys.displayHead("GoodBye! See you next time..", true);
+	sys.displayHead("欢迎再次使用, 再见!", false);
 	return 0;
 }
