@@ -12,21 +12,23 @@
 #### 定积分运算
 ![定积分运算](/images/定积分运算.png)
 
-#### clear功能
-![clear](/images/clear.png)
-
 #### help功能
+![clear](/images/help.png)
+
+#### clear功能
 ![clear](/images/clear.png)
 
 ## 一. 实验目的
 未知目的
+
 ## 二. 实验环境
-- IDE: Visual Studio 2015, JetBrains CLion 2016.1.1
 - Operation System: Win10 x64
-### 2.1 编程语言和开发工具
-- 编程语言： ANSI C/C++
-- 开发工具： 可自行选择
-### 2.2 编码规范
+
+### 编程语言和开发工具
+- 编程语言： C++(11)
+- IDE: Visual Studio 2015, JetBrains CLion 2016.1.1
+
+### 编码规范
 要求遵循良好的程序设计风格来设计和编写程序。基本编码规范：
 1. 标识符的命名要到达顾名思义的程度；
 2. 关键代码提供清晰、准确的注释；
