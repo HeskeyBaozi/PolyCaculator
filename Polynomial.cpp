@@ -19,7 +19,7 @@ istream& operator>>(istream& in, Polynomial& poly)
 int operator>>(string& polynomialString, Polynomial& poly)
 {
 	/*
-	* 函数体内m开头变量代表与单项式monomial相关的
+	*  函数体内m开头变量代表与单项式monomial相关的
 	*/
 	int mNumber = 0;
 
