@@ -27,22 +27,22 @@ Monomial::Monomial(const Monomial& oldMono)
 
 inline double Monomial::getCoefficient() const
 {
-	return coefficient;
+	return __coefficient;
 }
 
 inline double Monomial::getPower() const
 {
-	return power;
+	return __power;
 }
 
 inline void Monomial::setCoefficient(const double coefficient_)
 {
-	coefficient = coefficient_;
+	__coefficient = coefficient_;
 }
 
 inline void Monomial::setPower(const double power_)
 {
-	power = power_;
+	__power = power_;
 }
 
 Monomial Monomial::operator-() const

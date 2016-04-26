@@ -48,11 +48,12 @@ void System::displayInstruction(int width)
 void System::displaySimpleInstruction(bool simplist, int width)
 {
 	cout << "现在可以输入命令如下: \n";
-	if(simplist)
+	if (simplist)
 	{
 		cout << string(5, ' ') << "【push】,【remove】,【show】,【get】" << endl;
 		cout << string(5, ' ') << "【save】,【clear】,【reload】,【help】,【quit】" << endl;
-	}else
+	}
+	else
 	{
 		cout << string(7, ' ') << "【 push 】添加多项式" << string(9, ' ') << "【remove】移除多项式\n" << string(7, ' ') << "【 show 】多项式运算" << string(9, ' ') << "【  get 】多项式求值与积分运算\n" << string(7, ' ') << "【 help 】查看详细帮助" << string(7, ' ') << "【 save 】快速保存\n" << string(7, ' ') << "【 clear】清除所有数据" << string(7, ' ') << "【reload】重新加载数据\n" << string(7, ' ') << "【 quit 】保存并退出" << endl;
 	}
@@ -147,23 +148,46 @@ bool System::inputContent(const std::string& content, std::string& key, Polynomi
 	return false;
 }
 
-void System::instructionSwitcher(const std::string& instruction, const std::string& content)
+/*
+* switche(...): 这是一个重要的跳转函数, 在main中被调用
+*            功能: 根据命令instruction, 跳转到不同的模块
+*    instruction: 接受到的指令
+*                  单指令: help, clear, reload, save
+*                 一定要接着内容的指令: push, remove, show, get
+*        content: 接受到的内容, 对于单指令来说, 内容是无所谓的, 因为用不到
+*/
+void System::switcher(const std::string& instruction, const std::string& content)
 {
+	/* =====================================
+	*      单命令(就是只有一个单词的命令)部分
+	*  =====================================*/
+	/*
+	* 如果指令是help(帮助)
+	* 调用显示详细的命令语法函数displayInstruction()
+	*/
 	if (instruction == "help")
 	{
 		displayHead("");
 		displayInstruction();
 		return;
 	}
+
+	/*
+	* 如果指令是reload(重新加载)
+	*/
 	if (instruction == "reload")
 	{
 		reload();
-		displayHead("");		
+		displayHead("");
 		cout << "重新加载完成" << endl;
 		displaySimpleInstruction(true);
 		cout << endl;
 		return;
 	}
+
+	/*
+	* 如果指令是save(保存)
+	*/
 	if (instruction == "save")
 	{
 		save();
@@ -172,6 +196,10 @@ void System::instructionSwitcher(const std::string& instruction, const std::stri
 		cout << endl;
 		return;
 	}
+
+	/*
+	* 如果指令是clear(清除数据)
+	*/
 	if (instruction == "clear")
 	{
 		clear();
@@ -181,23 +209,23 @@ void System::instructionSwitcher(const std::string& instruction, const std::stri
 		cout << endl;
 		return;
 	}
+
+	/* =====================================
+	*             命令 + 内容形式
+	*  =====================================*/
+	/*
+	*       key: 保存处理后的多项式的名字
+	*    result: 保存处理后的多项式
+	*/
 	string key;
 	Polynomial result;
-	/*
-	* 根据内容判断是二元运算还是一元运算
-	*/
-	bool operationType = operationJudge(content);
 
 	/*
 	* push: 添加多项式指令
 	*/
 	if (instruction == "push")
 	{
-		Polynomial poly;
-		if (inputContent(content, key, poly) == false)
-			return;
-		this->getDictionary().emplace(key, poly);
-		displayHead("成功添加该多项式");
+		push(content, key, result);
 		return;
 	}
 
@@ -206,15 +234,7 @@ void System::instructionSwitcher(const std::string& instruction, const std::stri
 	*/
 	if (instruction == "remove")
 	{
-		if (inputContent(content, key) == false)
-			return;
-		if (this->getDictionary().erase(key) != 0)
-			displayHead("成功移除该多项式");
-		else
-		{
-			cerr << "key值对应的多项式找不到" << endl;
-			return;
-		}
+		remove(content, key);
 		return;
 	}
 
@@ -223,93 +243,25 @@ void System::instructionSwitcher(const std::string& instruction, const std::stri
 	*/
 	if (instruction == "show")
 	{
-
-		if (operationType == true)
-		{
-			/*
-			* 二元运算情况
-			*/
-
-			Polynomial lhs;
-			Polynomial rhs;
-			char sign = getOperationSign(content);
-			if (inputContent(content, key, lhs, rhs, sign) == false)return;
-			switch (sign)
-			{
-			case '+':result = lhs + rhs; break;
-			case '-':result = lhs - rhs; break;
-			case '*':result = lhs * rhs; break;
-			}
-		}
-		else
-		{
-			/*
-			* 一元运算情况
-			*/
-			Polynomial poly;
-			char sign = getOperationSign(content);
-			if (inputContent(content, key, poly, sign,false) == false)return;
-			switch (sign)
-			{
-			case '!':result = !poly; break;
-			case '~':result = ~poly; break;
-			}
-		}
 		/*
-		* 如果有key, 则存入字典中
+		* 其中根据operationJudge(content)指内容判断是二元运算还是一元运算
 		*/
-		if (!key.empty())
-			this->getDictionary().emplace(key, result);
-		/*
-		* 输出结果
-		*/
-		displayHead("");
-		cout << "得到的结果为:\n" << string(5, ' ') << (key.empty() ? "结果 =" : string(key + "(x) =")) << result << endl;
-		displaySimpleInstruction(true);
-		cout << endl;
-		
+		show(operationJudge(content), content, key, result);
 		return;
 	}
 
+	/*
+	* get: 求值, 求定积分指令
+	*/
 	if (instruction == "get")
 	{
-		Polynomial poly; 
-		istringstream contentFlow(content);
-		double resultValue = 0.0;
-		string polyString;
-		getline(contentFlow, polyString, '(');
-		if (stringToPolynomial(polyString, poly) == false)return;
-		string expression;
-		getline(contentFlow, expression, '\n');
-		double a = 0.0, b = 0.0;
-		bool isValueOperation = false;
-		if (sscanf(expression.c_str(), "%lf,%lf)", &a, &b) != 2)
-		{
-			isValueOperation = true;
-			sscanf(expression.c_str(), "%lf)", &a);
-		}
-		/*
-		* 输出结果
-		*/
-		displayHead("");
-		
-		if (isValueOperation)
-		{
-			resultValue = poly(a);
-			if (key.empty())
-				cout << "得到的结果为:\n" << string(5, ' ') << polyString << "(" << a << ") = " << resultValue << endl;
-			else
-				cout << "得到的结果为:\n" << string(5, ' ') << key << "( " << a << " ) = " << resultValue << endl;
-		}
-		else
-		{
-			resultValue = poly(a, b);
-				cout << "得到的结果为:\n" << string(5, ' ') << "∫" << polyString << "(x)(" << a << "→" << b << ")" << key << " = " << resultValue << endl;
-		}
-		displaySimpleInstruction(true);
-		cout << endl;
-		return;		
+		get(content, key);
+		return;
 	}
+
+	/*
+	* 如果所有指令都不匹配, 则说明输入指令错误
+	*/
 	cerr << "指令输入有误, 请重新输入" << endl;
 }
 
@@ -413,6 +365,114 @@ void System::reload(const std::string& address)
 void System::clear()
 {
 	this->getDictionary().clear();
+}
+
+void System::push(const std::string& content, std::string& key, Polynomial& result)
+{
+	Polynomial poly;
+	if (inputContent(content, key, poly) == false)
+		return;
+	this->getDictionary().emplace(key, poly);
+	displayHead("成功添加该多项式");
+}
+
+void System::remove(const std::string& content, std::string& key)
+{
+	if (inputContent(content, key) == false)
+		return;
+	if (this->getDictionary().erase(key) != 0)
+		displayHead("成功移除该多项式");
+	else
+	{
+		cerr << "key值对应的多项式找不到" << endl;
+	}
+}
+
+void System::show(bool operationType, const std::string& content, std::string& key, Polynomial& result)
+{
+	if (operationType == true)
+	{
+		/*
+		* 二元运算情况
+		*/
+
+		Polynomial lhs;
+		Polynomial rhs;
+		char sign = getOperationSign(content);
+		if (inputContent(content, key, lhs, rhs, sign) == false)return;
+		switch (sign)
+		{
+		case '+':result = lhs + rhs; break;
+		case '-':result = lhs - rhs; break;
+		case '*':result = lhs * rhs; break;
+		}
+	}
+	else
+	{
+		/*
+		* 一元运算情况
+		*/
+		Polynomial poly;
+		char sign = getOperationSign(content);
+		if (inputContent(content, key, poly, sign, false) == false)return;
+		switch (sign)
+		{
+		case '!':result = !poly; break;
+		case '~':result = ~poly; break;
+		}
+	}
+	/*
+	* 如果有key, 则存入字典中
+	*/
+	if (!key.empty())
+		this->getDictionary().emplace(key, result);
+	/*
+	* 输出结果
+	*/
+	displayHead("");
+	cout << "得到的结果为:\n" << string(5, ' ') << (key.empty() ? "结果 =" : string(key + "(x) =")) << result << endl;
+	displaySimpleInstruction(true);
+	cout << endl;
+}
+
+void System::get(const std::string& content, std::string& key)
+{
+	Polynomial poly;
+	istringstream contentFlow(content);
+	double resultValue;
+	string polyString;
+	getline(contentFlow, polyString, '(');
+	if (stringToPolynomial(polyString, poly) == false)
+		return;
+	string expression;
+	getline(contentFlow, expression, '\n');
+	double a = 0.0, b = 0.0;
+	bool isValueOperation = false;
+	if (sscanf(expression.c_str(), "%lf,%lf)", &a, &b) != 2)
+	{
+		isValueOperation = true;
+		sscanf(expression.c_str(), "%lf)", &a);
+	}
+	/*
+	* 输出结果
+	*/
+	displayHead("");
+
+	if (isValueOperation)
+	{
+		resultValue = poly(a);
+		if (key.empty())
+			cout << "得到的结果为:\n" << string(5, ' ') << polyString << "(" << a << ") = " << resultValue << endl;
+		else
+			cout << "得到的结果为:\n" << string(5, ' ') << key << "( " << a << " ) = " << resultValue << endl;
+	}
+	else
+	{
+		resultValue = poly(a, b);
+		cout << "得到的结果为:\n" << string(5, ' ') << "∫" << polyString << "(x)(" << a << "→" << b << ")" << key << " = " << resultValue << endl;
+	}
+	displaySimpleInstruction(true);
+	cout << endl;
 }
 
 void System::printLine(char ch, int width)

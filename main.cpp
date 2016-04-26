@@ -7,15 +7,16 @@ int main()
 	System sys;
 	sys.displayHead("ª∂”≠ π”√!");
 	sys.displaySimpleInstruction();
+
 	string order;
 	cout << ">>> ";
 	getline(cin, order, '\n');
 	while (order != "quit")
 	{
-		string instruction;
-		string content;
+		string instruction, content;
 		sys.inputOrder(order, instruction, content);
-		sys.instructionSwitcher(instruction, content);		
+		sys.switcher(instruction, content);		
+
 		cout << ">>> ";
 		getline(cin, order, '\n');
 	}

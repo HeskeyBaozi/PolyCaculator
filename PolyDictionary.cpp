@@ -82,15 +82,15 @@ ofstream& operator<<(ofstream& fout, PolyDictionary& poly)
 
 inline map<string, Polynomial>& PolyDictionary::getDictionary()
 {
-	return dictionary;
+	return __dictionary;
 }
 
 double PolyDictionary::operator()(const string& key, double x) const
 {
-	return dictionary.at(key)(x);
+	return __dictionary.at(key)(x);
 }
 
 Polynomial& PolyDictionary::operator[](const std::string& key)
 {
-	return dictionary.at(key);
+	return __dictionary.at(key);
 }

@@ -13,7 +13,7 @@ public:
 	Polynomial& operator[](const std::string& key);
 	
 private:
-	std::map<std::string, Polynomial> dictionary;
+	std::map<std::string, Polynomial> __dictionary;
 };
 
 int operator>>(std::ifstream& fin, PolyDictionary& dictionary);

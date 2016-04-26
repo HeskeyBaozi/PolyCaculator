@@ -48,7 +48,7 @@ int operator>>(string& polynomialString, Polynomial& poly)
 			Monomial mTemp(mString);
 			if (!mTemp.isZero())
 			{
-				poly.getPolyLibrary().push_back(mTemp);
+				poly.getPolynomial().push_back(mTemp);
 				mNumber++;
 			}
 		}
@@ -80,7 +80,7 @@ ostream& operator<<(ostream& out, Polynomial& poly)
 	/*
 	* 若多项式为空, 输出警告信息
 	*/
-	if (poly.getPolyLibrary().empty())
+	if (poly.getPolynomial().empty())
 	{
 		out << " [Empty Polynomial!]";
 		return out;
@@ -89,27 +89,27 @@ ostream& operator<<(ostream& out, Polynomial& poly)
 	/*
 	* 保证第一项的系数是正数情况下, 多项式由空格开始
 	*/
-	if (poly.getPolyLibrary()[0].getCoefficient() >= 0)
+	if (poly.getPolynomial()[0].getCoefficient() >= 0)
 		out << " ";
-	out << poly.getPolyLibrary()[0];
+	out << poly.getPolynomial()[0];
 
 	/*
 	* 遍历每个单项式并输出
 	*/
-	for (size_t i = 1; i < poly.getPolyLibrary().size(); i++)
+	for (size_t i = 1; i < poly.getPolynomial().size(); i++)
 	{
-		if (poly.getPolyLibrary()[i].getCoefficient() >= 0)
+		if (poly.getPolynomial()[i].getCoefficient() >= 0)
 			out << " + ";
-		out << poly.getPolyLibrary()[i];
+		out << poly.getPolynomial()[i];
 	}
 	return out;
 }
 
 ofstream& operator<<(ofstream& fout, Polynomial& poly)
 {
-	for (size_t i = 0; i < poly.getPolyLibrary().size(); i++)
+	for (size_t i = 0; i < poly.getPolynomial().size(); i++)
 	{
-		fout << poly.getPolyLibrary()[i];
+		fout << poly.getPolynomial()[i];
 	}
 	return fout;
 }
@@ -134,22 +134,22 @@ void Polynomial::sortByPowerDescend()
 	* 第三个参数是一个lambda表达式
 	* 这个lambda表达式表示排序靠前的指数要大于排序靠后的
 	*/
-	std::sort(polyLibrary.begin(), polyLibrary.end(), [](const Monomial& lhs, const Monomial& rhs)
+	std::sort(__polynomial.begin(), __polynomial.end(), [](const Monomial& lhs, const Monomial& rhs)
 	{
 		return lhs.getPower() > rhs.getPower();
 	});
 }
 
-inline vector<Monomial>& Polynomial::getPolyLibrary()
+inline vector<Monomial>& Polynomial::getPolynomial()
 {
-	return polyLibrary;
+	return __polynomial;
 }
 
 Polynomial Polynomial::operator-() const
 {
 	Polynomial temp = *this;
-	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
-	i != temp.getPolyLibrary().end();++i)
+	for (vector<Monomial>::iterator i = temp.getPolynomial().begin();
+	i != temp.getPolynomial().end();++i)
 	{
 		*i = -*i;
 	}
@@ -159,9 +159,9 @@ Polynomial Polynomial::operator-() const
 double Polynomial::operator()(double x) const
 {
 	double sum = 0;
-	for (size_t i = 0; i < polyLibrary.size(); i++)
+	for (size_t i = 0; i < __polynomial.size(); i++)
 	{
-		sum += polyLibrary[i](x);
+		sum += __polynomial[i](x);
 	}
 	return sum;
 }
@@ -169,8 +169,8 @@ double Polynomial::operator()(double x) const
 Polynomial Polynomial::operator!() const
 {
 	Polynomial temp = *this;
-	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
-	i != temp.getPolyLibrary().end(); ++i)
+	for (vector<Monomial>::iterator i = temp.getPolynomial().begin();
+	i != temp.getPolynomial().end(); ++i)
 	{
 		*i = !*i;
 	}
@@ -180,8 +180,8 @@ Polynomial Polynomial::operator!() const
 Polynomial Polynomial::operator~() const
 {
 	Polynomial temp = *this;
-	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
-	i != temp.getPolyLibrary().end(); ++i)
+	for (vector<Monomial>::iterator i = temp.getPolynomial().begin();
+	i != temp.getPolynomial().end(); ++i)
 	{
 		*i = ~*i;
 	}
@@ -191,8 +191,8 @@ Polynomial Polynomial::operator~() const
 double Polynomial::operator()(const double lowerBound, const double upperBound)
 {
 	double resultSum = 0;
-	for (vector<Monomial>::iterator i = polyLibrary.begin();
-	i != polyLibrary.end(); ++i)
+	for (vector<Monomial>::iterator i = __polynomial.begin();
+	i != __polynomial.end(); ++i)
 	{
 		resultSum += (*i)(lowerBound, upperBound);
 	}
@@ -202,16 +202,16 @@ double Polynomial::operator()(const double lowerBound, const double upperBound)
 Polynomial operator+(Polynomial& lhs, Polynomial& rhs)
 {
 	Polynomial temp;
-	vector<Monomial>::iterator lhsPoint = lhs.getPolyLibrary().begin();
-	vector<Monomial>::iterator rhsPoint = rhs.getPolyLibrary().begin();
-	while (lhsPoint != lhs.getPolyLibrary().end()
-		&& rhsPoint != rhs.getPolyLibrary().end())
+	vector<Monomial>::iterator lhsPoint = lhs.getPolynomial().begin();
+	vector<Monomial>::iterator rhsPoint = rhs.getPolynomial().begin();
+	while (lhsPoint != lhs.getPolynomial().end()
+		&& rhsPoint != rhs.getPolynomial().end())
 	{
 		if (*lhsPoint == *rhsPoint)
 		{
 			Monomial result = *lhsPoint + *rhsPoint;
 			if (abs(result.getCoefficient()) > Ep)
-				temp.getPolyLibrary().push_back(result);
+				temp.getPolynomial().push_back(result);
 			++lhsPoint;
 			++rhsPoint;
 		}
@@ -219,24 +219,24 @@ Polynomial operator+(Polynomial& lhs, Polynomial& rhs)
 		{
 			if (*lhsPoint > *rhsPoint)
 			{
-				temp.getPolyLibrary().push_back(*lhsPoint);
+				temp.getPolynomial().push_back(*lhsPoint);
 				++lhsPoint;
 			}
 			else
 			{
-				temp.getPolyLibrary().push_back(*rhsPoint);
+				temp.getPolynomial().push_back(*rhsPoint);
 				++rhsPoint;
 			}
 		}
 	}
-	while (lhsPoint != lhs.getPolyLibrary().end())
+	while (lhsPoint != lhs.getPolynomial().end())
 	{
-		temp.getPolyLibrary().push_back(*lhsPoint);
+		temp.getPolynomial().push_back(*lhsPoint);
 		++lhsPoint;
 	}
-	while (rhsPoint != rhs.getPolyLibrary().end())
+	while (rhsPoint != rhs.getPolynomial().end())
 	{
-		temp.getPolyLibrary().push_back(*rhsPoint);
+		temp.getPolynomial().push_back(*rhsPoint);
 		++rhsPoint;
 	}
 	return temp;
@@ -251,8 +251,8 @@ Polynomial operator-(Polynomial& lhs, Polynomial& rhs)
 Polynomial operator*(Monomial& lhs, Polynomial& rhs)
 {
 	Polynomial temp = rhs;
-	for (vector<Monomial>::iterator i = temp.getPolyLibrary().begin();
-	i != temp.getPolyLibrary().end(); ++i)
+	for (vector<Monomial>::iterator i = temp.getPolynomial().begin();
+	i != temp.getPolynomial().end(); ++i)
 	{
 		*i = lhs * (*i);
 	}
@@ -263,8 +263,8 @@ Polynomial operator*(Polynomial& lhs, Polynomial& rhs)
 {
 	Polynomial resultPoly;
 	Polynomial lhsTemp = lhs;
-	for (vector<Monomial>::iterator lhsItemPoint = lhsTemp.getPolyLibrary().begin();
-	lhsItemPoint != lhsTemp.getPolyLibrary().end(); ++lhsItemPoint)
+	for (vector<Monomial>::iterator lhsItemPoint = lhsTemp.getPolynomial().begin();
+	lhsItemPoint != lhsTemp.getPolynomial().end(); ++lhsItemPoint)
 	{
 		Polynomial monoMultiPoly = (*lhsItemPoint) * rhs;
 		resultPoly = resultPoly + monoMultiPoly;

@@ -43,8 +43,8 @@ public:
 	*/
 	double operator()(const double lowerBound, const double upperBound)const;
 private:
-	double coefficient;
-	double power;
+	double __coefficient;
+	double __power;
 };
 
 /*

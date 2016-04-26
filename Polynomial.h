@@ -12,8 +12,9 @@ class Polynomial
 public:
 	explicit Polynomial(std::string polyString);
 	explicit Polynomial();
-	void sortByPowerDescend();
-	std::vector<Monomial>& getPolyLibrary();
+	
+	friend int operator>>(std::string& polynomialString, Polynomial& poly);
+	std::vector<Monomial>& getPolynomial();
 
 	Polynomial operator-() const;
 	double operator()(double x) const;
@@ -32,11 +33,12 @@ public:
 	*/
 	double operator()(const double lowerBound, const double upperBound);
 private:
-	std::vector<Monomial> polyLibrary;
+	std::vector<Monomial> __polynomial;
+	void sortByPowerDescend();
 };
 
 std::istream& operator>>(std::istream& in, Polynomial& poly);
-int operator>>(std::string& polynomialString, Polynomial& poly);
+
 
 std::ostream& operator<<(std::ostream& out, Polynomial& poly);
 std::ofstream& operator<<(std::ofstream& fout, Polynomial& poly);
