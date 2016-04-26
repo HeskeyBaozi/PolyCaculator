@@ -6,7 +6,7 @@ int main()
 {
 	System sys;
 	sys.displayHead("ª∂”≠ π”√!");
-	sys.displayInstruction();
+	sys.displaySimpleInstruction();
 	string order;
 	cout << ">>> ";
 	getline(cin, order, '\n');

@@ -22,6 +22,7 @@ public:
 	*/
 	void displayHead(const std::string message, bool showPoly = true, bool showLastLine = true, int width = WIDTH);
 	static void displayInstruction(int width = WIDTH);
+	static void displaySimpleInstruction(bool simplist = false, int width = WIDTH);
 
 	/*
 	* 处理函数, 根据instruction的值来处理读入的内容并输出结果
@@ -54,4 +55,11 @@ private:
 	bool stringToPolynomial(const std::string& polyStringOrKey, Polynomial& poly);
 	static bool operationJudge(const std::string& content);
 	static char getOperationSign(const std::string& content);
+
+	/*
+	* 处理用函数
+	*/
+	void save(const std::string& address = "file/data.txt");
+	void reload(const std::string& address = "file/data.txt");
+	void clear();
 };
