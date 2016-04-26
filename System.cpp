@@ -5,26 +5,20 @@ System::System()
 	:PolyDictionary()
 {
 	ifstream fin("file/data.txt");
-	if(fin)
-	{
+	if (fin)
 		fin >> *this;
-	}else
-	{
+	else
 		cerr << "Fail to init dictionary!" << endl;
-	}
 	fin.close();
 }
 
 System::~System()
 {
 	ofstream fout("file/data.txt");
-	if(fout)
-	{
+	if (fout)
 		fout << *this;
-	}else
-	{
+	else
 		cerr << "Fail to appendid new data" << endl;
-	}
 	fout.close();
 }
 
@@ -34,112 +28,101 @@ void System::displayHead(const std::string message, bool showPoly, bool showLast
 	printLine();
 	cout << "\n";
 	displayPicture();
-	cout << string(width / 4, ' ') << message << "\n";	
+	cout << string(width / 4, ' ') << message << "\n";
 	if (showPoly)
 	{
 		cout << string(width / 4, ' ') << "目前存储的多项式有:" << "\n\n";
 		cout << *this << endl;
-	}		
+	}
 	if (showLastLine)
 		printLine();
 }
 
-void System::displayFunction(int width)
+void System::displayInstruction(int width)
 {
-	cout << "输入语法:\n";
+	cout << "输入语法如下: \n";
 	cout << string(7, ' ') << "push {key}:{Polymial}  ==>  添加多项式\n";
 	cout << string(5, ' ') << "remove {key}:{Polymial}  ==>  移除多项式\n";
-	cout << string(7, ' ') << "show {key}:{Polymial}{Sign}{Polymial}  ==>  执行多项式加减乘运算, 并添加至系统中\n";
-	cout << string(7, ' ') << "show {Polymial}{Sign}{Polymial}  ==>  执行多项式加减乘运算\n";
+	cout << string(7, ' ') << "show {Polymial} + {Polymial}  ==>  多项式加法运算\n";
+	cout << string(7, ' ') << "show {Polymial} - {Polymial}  ==>  多项式减法运算\n";
+	cout << string(7, ' ') << "show {Polymial} * {Polymial}  ==>  多项式乘法运算\n";
+	cout << string(7, ' ') << "show !{Polymial}  ==>  多项式求导\n";
+	cout << string(7, ' ') << "show ~{Polymial}  ==>  多项式求不定积分\n";
+	cout << "\n";
+	cout << string(5, ' ') << "温馨技巧提示: \n";
+	cout << string(7, ' ') << "在show命令中, 在表达式前面加入前缀  \"{key}:\"\n" << string(7, ' ') << "即可将该结果以名字key存入系统中\n";
 }
 
-void System::dealContent(const string& instruction, const string& content)
+bool System::inputOrder(const std::string& order, std::string& instruction, std::string& content) const
 {
-	if (instruction == "push" || instruction == "remove")
+	istringstream orderFlow(order);
+	getline(orderFlow, instruction, ' ');
+	getline(orderFlow, content, '\n');
+	if (instruction.empty() || content.empty())
 	{
-		istringstream contentFlow(content);
-		string key;
+		cerr << "命令或者内容为空" << endl;
+		return false;
+	}
+	return true;
+}
+
+bool System::inputContent(const std::string& content, string& key, Polynomial& poly, const char sign, bool keyNeeded)
+{
+	istringstream contentFlow(content);
+	if (keyNeeded)
+	{
 		getline(contentFlow, key, ':');
-		if (instruction == "push")
+		string polyString;
+		getline(contentFlow, polyString, '\n');
+		if (polyString.empty())
 		{
-			string value;
-			getline(contentFlow, value, '\n');
-			pushPoly(key, value);
-		}else
-		{
-			removePoly(key);
+			cerr << "多项式内容为空, 请重新输入" << endl;
+			return false;
 		}
-		return;
+		poly = Polynomial(polyString);
+		return true;
 	}
-	if (instruction == "show")
-	{	
-		if (content.find('+') != content.npos)
-			show(content, '+');
-		else
-			if (content.find('-') != content.npos)
-				show(content, '-');
-			else
-				if (content.find('*') != content.npos)
-					show(content, '*');
-				else
-					cerr << "请输入一个表达式 : )" << endl;		
-		return;
+	else
+	{
+		/*
+		* 读取key, 若没有key, 则为空
+		*/
+		bool keyFound = content.find(':') != content.npos;
+		if (keyFound)
+			getline(contentFlow, key, ':');
+		/*
+		* 获取运算表达式
+		*/
+		string expression;
+		getline(contentFlow, expression, '\n');
+		string::iterator i = expression.begin();
+		while (*i == sign)++i;
+		string polyStringOrKey(i, expression.end());
+		if (stringToPolynomial(polyStringOrKey, poly))return true;
+		return false;
 	}
-	displayHead("指令输入有误, 请重新输入");
 }
 
-void System::pushPoly(const string& key, const string& value)
+bool System::inputContent(const std::string& order, std::string& key) const
 {
-	string message("成功添加该多项式");
-	try
+	istringstream orderFlow(order);
+	getline(orderFlow, key, '\n');
+	if (key.empty())
 	{
-		if (value.empty() || key.empty())
-			throw runtime_error("key或value的值为空");
+		cerr << "key内容为空, 请重新输入" << endl;
+		return false;
 	}
-	catch (runtime_error err)
-	{
-		message = "添加失败, 可以重新输入一个新指令";
-		displayHead(message);
-		return;
-	}
-	Polynomial pTemp(value);
-	pushPoly(key, pTemp);
+	return true;
 }
 
-void System::pushPoly(const std::string& key, const Polynomial& polyValue)
-{
-	string message("成功添加该多项式");
-	this->getDictionary().emplace(key, polyValue);
-	displayHead(message);
-}
-
-void System::removePoly(const std::string& key)
-{
-	string message("成功删除该多项式");
-	try
-	{
-		if (key.empty())
-			throw runtime_error("key的值为空");
-	}
-	catch (runtime_error err)
-	{
-		message = "删除失败, 可以重新输入一个新指令";
-		displayHead(message);
-		return;
-	}
-	this->getDictionary().erase(key);
-	displayHead(message);
-}
-
-void System::show(const string& content, const char sign)
+bool System::inputContent(const std::string& content, std::string& key, Polynomial& lhs, Polynomial& rhs, const char sign)
 {
 	istringstream contentFlow(content);
 	/*
 	* 读取key, 若没有key, 则为空
 	*/
-	string key;
-	bool keyIsNotEmpty = content.find(':') != content.npos;
-	if (keyIsNotEmpty)
+	bool keyFound = content.find(':') != content.npos;
+	if (keyFound)
 		getline(contentFlow, key, ':');
 	/*
 	* 读入二元运算对象的构造字符串
@@ -147,73 +130,109 @@ void System::show(const string& content, const char sign)
 	string lhsStr, rhsStr;
 	getline(contentFlow, lhsStr, sign);
 	getline(contentFlow, rhsStr, '\n');
-
-	/*
-	* 读入结果, 若读入失败则返回
-	*/
-	Polynomial result;
-	if (operationByString(lhsStr, rhsStr, sign, result) == false)
-		return;
-	/*
-	* 如果有key, 则存入字典中
-	*/
-	if (keyIsNotEmpty)
-		this->getDictionary().emplace(key, result);
-	/*
-	* 输出结果
-	*/
-	displayHead("");
-	cout << "得到的结果为:\n" << string(5, ' ') << (key.empty() ? "结果 =" : string(key + "(x) =")) << result << endl;
-}
-
-bool System::operationByString(std::string& lhsStr, std::string&rhsStr, const char sign, Polynomial& result)
-{
-	Polynomial lhs, rhs;
-	if (lhsStr.find('(') == lhsStr.npos)
+	if (lhsStr.empty() || rhsStr.empty())
 	{
-		clearSpace(lhsStr, ' ');
-		if (this->getDictionary().find(lhsStr) == this->getDictionary().end())
-		{
-			cerr << "有一项多项式找不到: " << lhsStr << " ,请重新输入指令" << endl;
-			return false;
-		}
-		lhs = this->getDictionary().at(lhsStr);
-	}
-	else
-	{
-		lhs = Polynomial(lhsStr);
-	}
-	if (rhsStr.find('(') == rhsStr.npos)
-	{
-		clearSpace(rhsStr, ' ');
-		if (this->getDictionary().find(rhsStr) == this->getDictionary().end())
-		{
-			cerr << "有一项多项式找不到: " << rhsStr << " ,请重新输入指令" << endl;
-			return false;
-		}
-		rhs = this->getDictionary().at(rhsStr);
-	}
-	else
-	{
-		rhs = Polynomial(rhsStr);
-	}
-	switch (sign)
-	{
-	case '+':
-		result = Polynomial(lhs + rhs);
-		break;
-	case '-':
-		result = Polynomial(lhs - rhs);
-		break;
-	case '*':
-		result = Polynomial(lhs * rhs);
-		break;
-	default:
-		cerr << "无法执行次操作" << endl;
+		cerr << "其中一项多项式为空, 请重新输入" << endl;
 		return false;
 	}
-	return true;
+	bool successLhs = stringToPolynomial(lhsStr, lhs);
+	bool successRhs = stringToPolynomial(rhsStr, rhs);
+	if (successLhs&&successRhs)return true;
+	return false;
 }
+
+void System::instructionSwitcher(const std::string& instruction, const std::string& content)
+{
+	/*
+	* 根据内容判断是二元运算还是一元运算
+	*/
+	bool operationType = operationJudge(content);
+
+	/*
+	* push: 添加多项式指令
+	*/
+	if (instruction == "push")
+	{
+		string key;
+		Polynomial poly;
+		if (inputContent(content, key, poly) == false)
+			return;
+		this->getDictionary().emplace(key, poly);
+		displayHead("成功添加该多项式");
+		return;
+	}
+
+	/*
+	* remove: 移除多项式指令
+	*/
+	if (instruction == "remove")
+	{
+		string key;
+		if (inputContent(content, key) == false)
+			return;
+		if (this->getDictionary().erase(key) != 0)
+			displayHead("成功移除该多项式");
+		else
+		{
+			cerr << "key值对应的多项式找不到" << endl;
+			return;
+		}
+		return;
+	}
+
+	/*
+	* show: 展现运算指令
+	*/
+	if (instruction == "show")
+	{
+		string key;
+		Polynomial result;
+		if (operationType == true)
+		{
+			/*
+			* 二元运算情况
+			*/
+
+			Polynomial lhs;
+			Polynomial rhs;
+			char sign = getOperationSign(content);
+			if (inputContent(content, key, lhs, rhs, sign) == false)return;
+			switch (sign)
+			{
+			case '+':result = lhs + rhs; break;
+			case '-':result = lhs - rhs; break;
+			case '*':result = lhs * rhs; break;
+			}
+		}
+		else
+		{
+			/*
+			* 一元运算情况
+			*/
+			Polynomial poly;
+			char sign = getOperationSign(content);
+			if (inputContent(content, key, poly, sign,false) == false)return;
+			switch (sign)
+			{
+			case '!':result = !poly; break;
+			case '~':result = ~poly; break;
+			}
+		}
+		/*
+		* 如果有key, 则存入字典中
+		*/
+		if (!key.empty())
+			this->getDictionary().emplace(key, result);
+		/*
+		* 输出结果
+		*/
+		displayHead("");
+		cout << "得到的结果为:\n" << string(5, ' ') << (key.empty() ? "结果 =" : string(key + "(x) =")) << result << endl;
+		return;
+	}
+	displayHead("指令输入有误, 请重新输入");
+}
+
 
 void System::displayPicture(int width)
 {
@@ -222,6 +241,76 @@ void System::displayPicture(int width)
 	cout << string(width / 4, ' ') << " ┈ ┈ /█\\/▓\\ ﹎ ┈ ﹎﹎ ┈ ﹎ \n";
 	cout << string(width / 4, ' ') << "▅▆▇█████▇▆▅▃▂┈﹎\n" << endl;
 }
+
+
+/*
+* 用可能是key或者是括号形式的字符串转换成多项式
+*   polyString: 字符串, 可能是key, 也可能是有括号的多项式字符
+*         poly: 用来保存结果的多项式
+*       return: 布尔值
+*               true: poly成功得到赋值
+*              false: poly赋值失败原因为key对应的多项式找不到
+*/
+bool System::stringToPolynomial(const std::string& polyStringOrKey, Polynomial& poly)
+{
+	/*
+	* 判断polyString 是否是一个标识符key
+	*/
+	bool polyStringIsKey = polyStringOrKey.find('(') == polyStringOrKey.npos;
+	if (polyStringIsKey)
+	{
+		string key = polyStringOrKey;
+		clearSpace(key, ' ');
+		bool keyIsFound = this->getDictionary().find(key) != this->getDictionary().end();
+		/*
+		* 若找到key, 则poly赋值为key所对应的多项式
+		*/
+		if (keyIsFound)
+		{
+			poly = this->getDictionary().at(key);
+			return true;
+		}
+		cerr << "有一项多项式找不到: " << key << " ,请重新输入指令" << endl;
+		return false;
+	}
+	/*
+	* 若polyString是带括号的多项式字符串
+	* 则直接赋给poly
+	*/
+	poly = Polynomial(polyStringOrKey);
+	return true;
+}
+
+/*
+* 判断内容是二元运算还是一元运算
+*  true: 二元
+* false: 一元
+*/
+bool System::operationJudge(const std::string& content)
+{
+	bool findBinarySign = content.find('+') != string::npos
+		|| content.find('-') != string::npos
+		|| content.find('*') != string::npos;
+	if (findBinarySign)return true;
+	return false;
+}
+
+char System::getOperationSign(const std::string& content)
+{
+	if (content.find('+') != string::npos)
+		return '+';
+	if (content.find('-') != string::npos)
+		return '-';
+	if (content.find('*') != string::npos)
+		return '*';
+	if (content.find('!') != string::npos)
+		return '!';
+	if (content.find('~') != string::npos)
+		return '~';
+	return '+';
+}
+
+
 
 
 void System::printLine(char ch, int width)

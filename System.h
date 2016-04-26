@@ -12,28 +12,46 @@ public:
 	System();
 	~System();
 
+	/* ==============================
+	*           输入输出部分
+	*  ==============================*/
 	/*
-	* IO部分:
-	*    displayHead: 展现屏幕顶部的字符画与文字
-	* 
+	* Output:
+	*        displayHead(...): 清屏, 并显示页面头部信息
+	* displayInstruction(...): 显示命令语法
 	*/
 	void displayHead(const std::string message, bool showPoly = true, bool showLastLine = true, int width = WIDTH);
-	static void displayFunction(int width = WIDTH);
-	void dealContent(const std::string& instruction, const std::string& content);
+	static void displayInstruction(int width = WIDTH);
+
+	/*
+	* 处理函数, 根据instruction的值来处理读入的内容并输出结果
+	*/
+	void instructionSwitcher(const std::string& instruction, const std::string& content);
+
+	/*
+	* Input:
+	*      inputOrder(...): 从一整行命令语句中读入指令和指令的内容
+	*    inputContent(...): 根据指令的内容读取相关信息, 有三个重载函数
+	*              重载(1): 读取形式 {key}:{Polymial}, key可选
+	*              重载(2): 读取形式 {key}
+	*              重载(3): 读取形式 {key}:{Polymial}{Sign}{Polymial}, key可选
+	*/
+	bool inputOrder(const std::string& order, std::string& instruction, std::string& content) const;
+	bool inputContent(const std::string& content, std::string& key, Polynomial& poly, const char sign = '!', bool keyNeeded = true);
+	bool inputContent(const std::string& content, std::string& key) const;
+	bool inputContent(const std::string& content, std::string& key, Polynomial& lhs, Polynomial& rhs, const char sign);
 	
 private:
 	/*
-	* 模块功能函数:
-	*       pushPoly: 添加多项式到字典中
-	*     removePoly: 从字典中移除多项式
+	* Output 内部使用函数
 	*/
-	void pushPoly(const std::string& key, const std::string& value);
-	void pushPoly(const std::string& key, const Polynomial& polyValue);
-	void removePoly(const std::string& key);
-	void show(const std::string& content, const char sign);
-	bool operationByString(std::string& lhsStr, std::string&rhsStr, const char sign, Polynomial& result);
-	bool operationByString(std::string& lhsStr, const char sign, Polynomial& result);
 	static void printLine(char ch = '=', int width = WIDTH);
 	static void displayPicture(int width = WIDTH);
-	
+
+	/*
+	* Input 内部使用函数
+	*/
+	bool stringToPolynomial(const std::string& polyStringOrKey, Polynomial& poly);
+	static bool operationJudge(const std::string& content);
+	static char getOperationSign(const std::string& content);
 };

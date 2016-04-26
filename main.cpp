@@ -6,19 +6,16 @@ int main()
 {
 	System sys;
 	sys.displayHead("ª∂”≠ π”√!");
-	sys.displayFunction();
+	sys.displayInstruction();
 	string order;
 	cout << ">>> ";
 	getline(cin, order, '\n');
 	while (order != "quit")
 	{
-		istringstream orderFlow(order);
 		string instruction;
 		string content;
-		getline(orderFlow, instruction, ' ');
-		getline(orderFlow, content, '\n');
-		sys.dealContent(instruction, content);
-		
+		sys.inputOrder(order, instruction, content);
+		sys.instructionSwitcher(instruction, content);		
 		cout << ">>> ";
 		getline(cin, order, '\n');
 	}
