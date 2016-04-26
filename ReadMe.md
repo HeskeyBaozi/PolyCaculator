@@ -7,15 +7,31 @@
 ![基本界面](/images/基本界面.png)
 
 #### 求导运算
+命令:
+```
+show n2': !n2
+```
 ![求导运算](/images/求导运算.png)
 
 #### 定积分运算
+命令:
+```
+get n2(0,5)
+```
 ![定积分运算](/images/定积分运算.png)
 
 #### help功能
+命令:
+```
+help
+```
 ![clear](/images/help.png)
 
 #### clear功能
+命令:
+```
+clear
+```
 ![clear](/images/clear.png)
 
 ## 一. 实验目的
