@@ -32,18 +32,22 @@ public:
 	* 定义定积分运算符(),通过重载()的形式
 	*/
 	double operator()(const double lowerBound, const double upperBound);
+
+	/*
+	* 其他重载运算符
+	*/
+
+	friend std::istream& operator>>(std::istream& in, Polynomial& poly);
+
+	friend std::ostream& operator<<(std::ostream& out, Polynomial& poly);
+	friend std::ofstream& operator<<(std::ofstream& fout, Polynomial& poly);
+
+	friend Polynomial operator+(Polynomial& lhs, Polynomial& rhs);
+	friend Polynomial operator-(Polynomial& lhs, Polynomial& rhs);
+	friend Polynomial operator*(Monomial& lhs, Polynomial& rhs);
+	friend Polynomial operator*(Polynomial& lhs, Polynomial& rhs);
 private:
 	std::vector<Monomial> __polynomial;
 	void sortByPowerDescend();
 };
 
-std::istream& operator>>(std::istream& in, Polynomial& poly);
-
-
-std::ostream& operator<<(std::ostream& out, Polynomial& poly);
-std::ofstream& operator<<(std::ofstream& fout, Polynomial& poly);
-
-Polynomial operator+(Polynomial& lhs, Polynomial& rhs);
-Polynomial operator-(Polynomial& lhs, Polynomial& rhs);
-Polynomial operator*(Monomial& lhs, Polynomial& rhs);
-Polynomial operator*(Polynomial& lhs, Polynomial& rhs);

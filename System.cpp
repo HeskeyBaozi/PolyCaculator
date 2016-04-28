@@ -448,10 +448,10 @@ void System::get(const std::string& content, std::string& key)
 	getline(contentFlow, expression, '\n');
 	double a = 0.0, b = 0.0;
 	bool isValueOperation = false;
-	if (sscanf(expression.c_str(), "%lf,%lf)", &a, &b) != 2)
+	if (sscanf_s(expression.c_str(), "%lf,%lf)", &a, &b) != 2)
 	{
 		isValueOperation = true;
-		sscanf(expression.c_str(), "%lf)", &a);
+		sscanf_s(expression.c_str(), "%lf)", &a);
 	}
 	/*
 	* Êä³ö½á¹û

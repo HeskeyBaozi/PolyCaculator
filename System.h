@@ -26,11 +26,19 @@ public:
 	static void displaySimpleInstruction(bool simplist = false, int width = WIDTH);
 
 	/*
+	* Input:
+	*      inputOrder(...): 从一整行命令语句中读入指令和指令的内容
+	*/
+	bool inputOrder(const std::string& order, std::string& instruction, std::string& content) const;
+	/*
 	* 取名为switcher, 意思是这个函数的功能就是跳转到各个模块的函数
 	* 跳转函数, 根据instruction的值来处理读入的内容并输出结果
 	*/
 	void switcher(const std::string& instruction, const std::string& content);
 
+
+
+private:
 	/*
 	* Input:
 	*      inputOrder(...): 从一整行命令语句中读入指令和指令的内容
@@ -39,12 +47,10 @@ public:
 	*              重载(2): 读取形式 {key}
 	*              重载(3): 读取形式 {key}:{Polymial}{Sign}{Polymial}, key可选
 	*/
-	bool inputOrder(const std::string& order, std::string& instruction, std::string& content) const;
 	bool inputContent(const std::string& content, std::string& key, Polynomial& poly, const char sign = '!', bool keyNeeded = true);
 	bool inputContent(const std::string& content, std::string& key) const;
 	bool inputContent(const std::string& content, std::string& key, Polynomial& lhs, Polynomial& rhs, const char sign);
 
-private:
 	/*
 	* Output 内部使用函数
 	*/
