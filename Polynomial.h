@@ -46,6 +46,7 @@ public:
 	friend Polynomial operator-(Polynomial& lhs, Polynomial& rhs);
 	friend Polynomial operator*(Monomial& lhs, Polynomial& rhs);
 	friend Polynomial operator*(Polynomial& lhs, Polynomial& rhs);
+
 private:
 	std::vector<Monomial> __polynomial;
 	void sortByPowerDescend();

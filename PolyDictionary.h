@@ -1,6 +1,7 @@
 #pragma once
 #include "Polynomial.h"
 #include <map>
+
 class PolyDictionary
 {
 	/*
