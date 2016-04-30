@@ -6,6 +6,7 @@
 - 15331097
 
 [这个多项式项目的Github](https://github.com/HeskeyBaozi/PolyCaculator)
+
 ![土叔](/images/ts14.jpg)
 
 ## 零. 成品
@@ -101,10 +102,10 @@ clear
 show a+b
 ```
 命令表示计算a+b并显示结果, (a,b各代表一个多项式)
-![show1](./images/run_ab.png)
+![show1](./images/show_ab.png)
 
 ##### 回车, 显示结果
-![show2](./images/run_ab_restult.png)
+![show2](./images/show_ab_restult.png)
 
 #### 多项式乘法
 
